@@ -1,0 +1,41 @@
+﻿@model GroupChatPageViewModel
+@if (ViewBag.ErrorMessage != null)
+{
+    <div class="alert alert-danger">
+        @ViewBag.ErrorMessage
+    </div>
+}
+<div class="container-fluid h-100 d-flex flex-column">
+    <div class="col-md-4 p-0 bg-light d-flex justify-content-around">
+        <h2>Chatlijst</h2>
+        <div>
+            @Html.ActionLink("Nieuw Chat", "NewChat", "Chat")
+        <i class="fa fa-plus"></i>
+        </div>
+    </div>
+    <div class="row flex-grow-1">
+        
+        <!-- Left Sidebar: Group List -->
+        <div class="col-md-4 p-0 bg-light">
+            @await Html.PartialAsync("GroupList", Model.Groups)
+        </div>
+
+        <!-- Right Chat Window -->
+        <div class="col-md-8 p-0 d-flex flex-column">
+            @if (Model.ActiveChat != null)
+            {
+                @await Html.PartialAsync("ChatMessages", Model.ActiveChat)
+            }
+            else
+            {
+                <div class="alert alert-info m-3 flex-grow-1 d-flex align-items-center justify-content-center">
+                    <h4>No chat selected</h4>
+                    <p>Please select a chat from the list on the left.</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+
+

@@ -1,0 +1,29 @@
+﻿@model UsChat.ASP.Models.User.ListUserViewModel
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-6 offset-md-3">
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">Start een nieuw gesprek</h4>
+                </div>
+                <ul class="list-group list-group-flush" id="friendsList">
+                    @foreach (var user in Model.Users)
+                    {
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            @user.Username
+                            <div>
+                                <a href="@Url.Action("GroupCreate", "Group", new { friendId = user.UserId, personal = true })" class="btn btn-success btn-sm mr-2">
+                                    <i class="fa fa-plus" aria-hidden="true"></i>
+                                </a>
+                            </div>
+                        </li>
+                    }
+                </ul>
+                <div class="card-footer d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">Maak een nieuwe groep</h4>
+                    <a href="@Url.Action("GroupCreate", "Group", new{ friendId = 0, personal = false})" class="btn btn-success btn-sm mr-2">a</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

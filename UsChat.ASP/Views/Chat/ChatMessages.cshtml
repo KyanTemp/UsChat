@@ -1,0 +1,42 @@
+﻿@model ChatViewModel
+
+<div class="card h-100 d-flex flex-column">
+    <div class="card-header bg-secondary text-white d-flex align-items-center justify-content-between">
+        <div class="d-flex flex-row align-items-center">
+        <div class="rounded-circle bg-success" style="width: 40px; height: 40px; margin-right: 10px;"></div>
+        <h5 class="m-0">@Model.GroupName</h5>
+        </div>
+        @if (!Model.PersonalChat)
+        {
+            <a href="@Url.Action("Index", "Group")" class="btn btn-info btn-sm mr-2">
+                <p>groep info</p>
+            </a>
+        }
+        
+        @Html.ActionLink("Delete Chat", "DeleteGroup", "Group")
+
+    </div>
+
+    <!-- Messages (Scrollable area) -->
+    <div id="messages" class="card-body overflow-auto" style="max-height: 60vh;">
+        @foreach (var message in Model.Messages)
+        {
+            <div class="mb-3 @(message.IsFromCurrentUser ? "bg-primary text-white" : "bg-light text-dark") p-2 rounded">
+                <p>@message.Content</p>
+                <small class="text-muted">@message.Timestamp</small>
+            </div>
+        }
+    </div>
+
+    <!-- New Message Input (fixed to the bottom) -->
+    <div class="card-footer">
+        
+        <form id="sendMessageForm" asp-action="SendMessage" asp-controller="Chat" method="post" class="d-flex">
+            @Html.AntiForgeryToken()
+            <input type="hidden" id="groupId" name="GroupId" value="@Model.GroupId" />
+            <textarea class="form-control me-2" id="newMessage" name="NewMessageContent" placeholder="Type a new message..."></textarea>
+            <button type="submit" class="btn btn-primary">Send</button>
+        </form>
+
+    </div>
+</div>

@@ -1,0 +1,119 @@
+﻿@model UsChat.ASP.Models.Group.GroupViewModel
+
+<div class="container mt-4">
+    <!-- Group Name -->
+    <div class="row justify-content-center">
+        <div class="col-md-6 text-center">
+            <h2>@Model.GroupName</h2>
+        </div>
+    </div>
+
+    <!-- Group Participants -->
+    <div class="row justify-content-center mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header text-center">
+                    <h4>Groep Participants</h4>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group" id="participantsList">
+                        @foreach (var admin in Model.Admins)
+                        {
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span>@admin.Username</span>
+                                <span>Admin</span>
+                            </li>
+                        }
+                        @foreach (var participant in Model.Participants)
+                        {
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span>@participant.Username</span>
+                                <a href="@Url.Action("MakeAdmin", "Group", new { id = participant.UserId })" class="btn btn-outline-primary btn-sm">Make Admin</a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+                <div class="card-footer text-center">
+                    <a href="@Url.Action("DeleteGroup", "Group", new { id = Model.GroupId })" class="btn btn-danger">Delete Group</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search Users to Add -->
+    <div class="row justify-content-center mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Zoek naar gebruikers om toe te voegen</h4>
+                </div>
+                <div class="card-body">
+                    <input type="text" id="userSearchInput" class="form-control mb-3" placeholder="Zoek op naam of email">
+                    <ul class="list-group" id="userSearchResults"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Handle search for users
+            $("#userSearchInput").on("input", function () {
+                searchUsers(); // Call the search function to keep logic reusable
+            });
+
+            function searchUsers() {
+                var query = $("#userSearchInput").val();
+                if (query.length > 2) { // Only search if more than 2 characters
+                    $.ajax({
+                        url: '@Url.Action("SearchFriendsForGroup", "Friend")',
+                        type: 'GET',
+                        data: { searchTerm: query },
+                        success: function (data) {
+                            $("#userSearchResults").empty();
+                            if (data.length > 0) {
+                                $.each(data, function (index, user) {
+                                    $("#userSearchResults").append(`
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            ${user.name} (${user.email})
+                                            <button class="btn btn-primary btn-sm addUserButton" data-user-id="${user.id}">Toevoegen</button>
+                                        </li>
+                                    `);
+                                });
+                            } else {
+                                $("#userSearchResults").append(`<li class="list-group-item">Geen resultaten gevonden</li>`);
+                            }
+                        }
+                    });
+                } else {
+                    $("#userSearchResults").empty();
+                }
+            }
+
+            // Handle adding a user to the group
+            $(document).on("click", ".addUserButton", function () {
+                var userId = $(this).data("user-id");
+                $.ajax({
+                    url: '@Url.Action("AddUserToGroup", "Group")',
+                    type: 'POST',
+                    data: { groupId: @Model.GroupId, userId: userId },
+                    success: function (newUser) {
+                        // Add the new user to the participants list
+                        $("#participantsList").append(`
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span>${newUser.name}</span>
+                                <a href="@Url.Action("MakeAdmin", "Group", new { id = "__userId__" })"
+                                   class="btn btn-outline-primary btn-sm">Make Admin</a>
+                            </li>
+                        `.replace("__userId__", newUser.id));
+
+                        // Refresh the search results
+                        searchUsers();
+                    }
+                });
+            });
+        });
+    </script>
+}

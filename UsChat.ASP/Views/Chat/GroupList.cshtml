@@ -1,0 +1,16 @@
+﻿@model List<GroupListViewModel>
+
+<div class="list-group list-group-flush">
+    @foreach (var group in Model)
+    {
+        <a href="@Url.Action("ChatPage", new { userId = ViewData["UserId"], selectedGroupId = group.GroupId })"
+           class="list-group-item list-group-item-action @(group.IsActive ? "active" : "") d-flex align-items-center">
+            <div class="rounded-circle bg-success" style="width: 40px; height: 40px; margin-right: 15px;"></div>
+            <div>
+                <strong>@group.GroupName</strong><br />
+                <small class="text-muted">@group.LastMessageTimestamp</small><br />
+                <span>@group.LastMessage</span>
+            </div>
+        </a>
+    }
+</div>

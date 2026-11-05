@@ -1,0 +1,40 @@
+﻿@model UsChat.ASP.Models.User.EditViewModel
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-6">
+            @ViewBag.Message
+            <h2>Edit Account</h2>
+            <form method="post" asp-controller="User" asp-action="Edit">
+                <div class="form-group mt-4">
+                    <label asp-for="Username" class="font-weight-bold"></label>
+                    <input asp-for="Username" class="form-control" placeholder="Username" />
+                    <span asp-validation-for="Username" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Email" class="font-weight-bold"></label>
+                    <input asp-for="Email" class="form-control" readonly />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label for="oldPassword" class="font-weight-bold">Old Password</label>
+                    <input asp-for="OldPassword" class="form-control" type="password" placeholder="Old Password" />
+                    <span asp-validation-for="OldPassword" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="NewPassword" class="font-weight-bold"></label>
+                    <input asp-for="NewPassword" class="form-control" type="password" placeholder="New Password" />
+                    <span asp-validation-for="NewPassword" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="VerifyPassword" class="font-weight-bold"></label>
+                    <input asp-for="VerifyPassword" class="form-control" type="password" placeholder="Verify Password" />
+                    <span asp-validation-for="VerifyPassword" class="text-danger"></span>
+                </div>
+                <div class="d-flex justify-content-between mt-3">
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

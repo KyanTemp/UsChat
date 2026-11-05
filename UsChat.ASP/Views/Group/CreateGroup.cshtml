@@ -1,0 +1,37 @@
+﻿@model UsChat.ASP.Models.User.ListUserViewModel
+
+<div class="container">
+    <h2 class="my-4">Vriendenlijst</h2>
+    @if (TempData["ResultMessage"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["ResultMessage"]
+        </div>
+    }
+    @if (Model.Users != null && Model.Users.Any())
+    {
+        <div class="row">
+            @foreach (var user in Model.Users)
+            {
+                <div class="col-md-12 mb-3">
+                    <div class="card">
+                        <div class="card-body d-flex justify-content-between align-items-center">
+                            <div>
+                                <h5 class="card-title">@user.Username</h5>
+                                <p class="card-text">User ID: @user.UserId</p>
+                                <p class="card-text">Email: @user.Email</p>
+                            </div>
+                            <div>
+                                @Html.ActionLink("Maak Gesprek", "GroupCreate", "Group")
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <p>No friends found.</p>
+    }
+</div>

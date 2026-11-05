@@ -1,0 +1,119 @@
+﻿@model UsChat.ASP.Models.User.ListUserViewModel
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-6 offset-md-3">
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">Vriendenlijst</h4>
+                    <button class="btn btn-success btn-sm" id="showAddFriend">+</button>
+                </div>
+                <ul class="list-group list-group-flush" id="friendsList">
+                    @foreach (var user in Model.Users)
+                    {
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            @user.Username
+                            <div>
+                                <a href="@Url.Action("BlockFriend", "Friend", new { userId = user.UserId })" class="btn btn-warning btn-sm mr-2" title="Blokkeren">
+                                    <i class="fa fa-ban"></i>
+                                </a>
+                                <a href="@Url.Action("RemoveFriend", "Friend", new { userId = user.UserId })" class="btn btn-danger btn-sm" title="Verwijderen">
+                                    <i class="fa fa-trash"></i>
+                                </a>
+                            </div>
+                        </li>
+                    }
+                </ul>
+            </div>
+
+            <div class="card" id="addFriendCard" style="display: none;">
+                <div class="card-header">
+                    <h4>Zoek naar nieuwe vrienden</h4>
+                </div>
+                <div class="card-body">
+                    <input type="text" id="friendSearchInput" class="form-control mb-3" placeholder="Zoek op email">
+                    <ul class="list-group" id="searchResults"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <script>
+        $(document).ready(function () {
+            // Toggle add friend card
+            $("#showAddFriend").click(function () {
+                $("#addFriendCard").toggle();
+            });
+
+            // Handle search for friends
+            $("#friendSearchInput").on("input", function () {
+                searchFriends(); // Call the search function to keep the logic reusable
+            });
+
+            function searchFriends() {
+                var query = $("#friendSearchInput").val();
+                if (query.length > 2) { // Only search if more than 2 characters
+                    $.ajax({
+                        url: '@Url.Action("SearchFriends", "Friend")',
+                        type: 'GET',
+                        data: { searchTerm: query },
+                        success: function (data) {
+                            $("#searchResults").empty();
+                            if (data.length > 0) {
+                                console.log(data);
+                                $.each(data, function (index, user) {
+                                    $("#searchResults").append(`
+                                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                    ${user.name} (${user.email})
+                                                    <button class="btn btn-primary btn-sm addFriendButton" data-user-id="${user.id}">Toevoegen</button>
+                                                </li>
+                                            `);
+                                });
+                            } else {
+                                $("#searchResults").append(`<li class="list-group-item">Geen resultaten gevonden</li>`);
+                            }
+                        }
+                    });
+                } else {
+                    $("#searchResults").empty();
+                }
+            }
+
+            // Handle adding a friend
+            $(document).on("click", ".addFriendButton", function () {
+                var userId = $(this).data("user-id");
+                $.ajax({
+                    url: '@Url.Action("AddFriend", "Friend")',
+                    type: 'POST',
+                    data: { userId: userId },
+                    success: function (newFriend) {
+                        console.log("Response from server:", newFriend); // Log response to verify data
+
+                        // Add the new friend to the friends list
+                        var blockFriendUrl = '@Url.Action("BlockFriend", "Friend", new { userId = "__userId__" })';
+                        var removeFriendUrl = '@Url.Action("RemoveFriend", "Friend", new { userId = "__userId__" })';
+
+                        $("#friendsList").append(`
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        ${newFriend.name}
+                                        <div>
+                                            <a href="${blockFriendUrl.replace('__userId__', newFriend.id)}" class="btn btn-warning btn-sm mr-2" title="Blokkeren">
+                                                <i class="fa fa-ban"></i>
+                                            </a>
+                                            <a href="${removeFriendUrl.replace('__userId__', newFriend.id)}" class="btn btn-danger btn-sm" title="Verwijderen">
+                                                <i class="fa fa-trash"></i>
+                                            </a>
+                                        </div>
+                                    </li>
+                                `);
+
+                        // Refresh the search results
+                        searchFriends();
+                    }
+                });
+            });
+        });
+    </script>
+}
